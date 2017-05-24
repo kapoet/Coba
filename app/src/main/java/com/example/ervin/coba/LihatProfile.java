@@ -76,7 +76,7 @@ public class LihatProfile extends AppCompatActivity{
                     dataPengguna.add(pf.getEmail());
                     dataPengguna.add(pf.getPekerjaan());
                     ArrayAdapter adapter = new ArrayAdapter(LihatProfile.this,android.R.layout.simple_list_item_1,dataPengguna);
-                    lvProfile.setAdapter(adapter);
+                    lvProfile.setAdapter(adapter);//lllll
             //    }
             }
 
