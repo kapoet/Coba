@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     EditText eTxtEmail, eTxtPassword;
-    Button btnSignin, btnSignout, btnTambahKerjaan, btnProfile, btnupload, btnEditProfiel;
+    Button btnSignin, btnSignout, btnTambahKerjaan, btnProfile, btnupload, btnEditProfiel, btnUploadFile;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
         btnTambahKerjaan = (Button) findViewById(R.id.tambahKerja);
         btnProfile = (Button) findViewById(R.id.profile);
         btnupload = (Button) findViewById(R.id.upload);
+        btnUploadFile = (Button) findViewById(R.id.uploadfile);
         btnEditProfiel = (Button) findViewById(R.id.editProfile);
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -90,6 +91,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, UploadActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        btnUploadFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, UploadFile.class);
                 startActivity(intent);
             }
         });

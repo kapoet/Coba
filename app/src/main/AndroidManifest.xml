@@ -23,6 +23,7 @@
         <activity android:name=".LihatProfile"/>
         <activity android:name=".UploadActivity"/>
         <activity android:name=".EditProfile"/>
+        <activity android:name=".UploadFile"/>
     </application>
 
 </manifest>
