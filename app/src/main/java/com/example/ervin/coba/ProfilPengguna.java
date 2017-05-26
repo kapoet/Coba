@@ -7,9 +7,30 @@ package com.example.ervin.coba;
 public class ProfilPengguna {
     String nama,
     email,
-    pekerjaan;
+    pekerjaan,
+    anak;
+
+    public String getAnak() {
+        return anak;
+    }
+
+    public void setAnak(String anak) {
+        this.anak = anak;
+    }
 
     public ProfilPengguna() {
+    }
+
+    public ProfilPengguna(String nama, String email) {
+        this.nama = nama;
+        this.email = email;
+    }
+
+    public ProfilPengguna(String nama, String email, String pekerjaan, String anak) {
+        this.nama = nama;
+        this.email = email;
+        this.pekerjaan = pekerjaan;
+        this.anak = anak;
     }
 
     public ProfilPengguna(String nama, String email, String pekerjaan) {

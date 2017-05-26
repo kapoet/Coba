@@ -66,6 +66,8 @@ public class LihatProfile extends AppCompatActivity{
                     pf.setEmail(dataSnapshot.child(userID).getValue(ProfilPengguna.class).getEmail());
                     pf.setNama(dataSnapshot.child(userID).getValue(ProfilPengguna.class).getNama());
                     pf.setPekerjaan(dataSnapshot.child(userID).getValue(ProfilPengguna.class).getPekerjaan());
+                String aa= dataSnapshot.getKey();
+                Log.d(TAG, "showData: name: " + aa);
                     Log.d(TAG, "showData: name: " + pf.getNama());
 
                     Log.d(TAG, "showData: email: " + pf.getEmail());

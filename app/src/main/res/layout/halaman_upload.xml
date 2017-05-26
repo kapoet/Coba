@@ -18,29 +18,13 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/back"
+            android:id="@+id/imageChooser"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="back" />
-
-        <Button
-            android:id="@+id/next"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="next" />
+            android:text="image chooser" />
 
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/gambar"
-        android:layout_width="wrap_content"
-        android:layout_height="20dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="0.07"
-        android:maxHeight="50dp"
-        app:srcCompat="@drawable/common_full_open_on_phone" />
 
     <EditText
         android:id="@+id/namaGambar"

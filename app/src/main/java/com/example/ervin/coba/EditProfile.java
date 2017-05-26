@@ -41,6 +41,7 @@ public class EditProfile extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference myRef = database.getReference().child("user");
+        final DatabaseReference myRef2 = database.getReference().child("admin");
         FirebaseUser user = mAuth.getCurrentUser();
         userID = user.getUid();
 
@@ -52,9 +53,10 @@ public class EditProfile extends AppCompatActivity {
                 for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
                     ProfilPengguna person = childSnapshot.getValue(ProfilPengguna.class);
                    // String value = dataSnapshot.getValue(String.class);
-                    String string = "Name: "+person.getNama();
+                    String string = "Name: "+person.getAnak();
                     a.setText(string);
-                    Log.d(TAG, "Value is: " + string);
+                    String aa = dataSnapshot.getKey();
+                    Log.d(TAG, "Value is: " + aa);
                 }
                 }
 
@@ -76,6 +78,7 @@ public class EditProfile extends AppCompatActivity {
                 } else {
                     ProfilPengguna profil=new ProfilPengguna(email,nama,pekerjaan);
                     myRef.child(userID).setValue(profil);
+                    myRef2.child(userID).setValue(profil);
                 }
             }
         });

@@ -79,7 +79,7 @@ public class TambahKerjaan extends AppCompatActivity{
                 if(!dataPekerjaan.isEmpty()){
                     FirebaseUser user = mAuth.getCurrentUser();
                     String userID = user.getUid();
-                    myRef.child(userID).child("pekerjaan").child("bidang").child(dataPekerjaan).setValue("true");
+                    myRef.child(userID).child("kerjaan").child(dataPekerjaan).setValue("true");
                 }
             }
         });

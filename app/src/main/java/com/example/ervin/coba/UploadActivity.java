@@ -1,7 +1,9 @@
 package com.example.ervin.coba;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -22,6 +24,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -30,6 +34,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+
+import in.myinnos.awesomeimagepicker.activities.AlbumSelectActivity;
+import in.myinnos.awesomeimagepicker.helpers.ConstantsCustomGallery;
+import in.myinnos.awesomeimagepicker.models.Image;
 
 import static com.example.ervin.coba.R.id.image;
 import static com.example.ervin.coba.R.id.namaGambar;
@@ -40,116 +48,69 @@ import static com.example.ervin.coba.R.id.namaGambar;
 
 public class UploadActivity extends AppCompatActivity {
     private static final String TAG = "UploadActivity";
-    Button btnUpload, btnNext, btnBefore;
+    Button btnUpload, btnImageChooser;
     ImageView ivGambar;
     EditText etNamaGambar;
     ProgressDialog progressDialog;
-    int panjangGambar = 512, lebarGambar= 512;
     ArrayList<String> lokasiGamabar;
     int posisiGmabar;
     private StorageReference mStorageRef;
     private FirebaseAuth mAuth;
+    String rawPath;
+    String path;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.halaman_upload);
-        btnBefore = (Button) findViewById(R.id.back);
-        btnNext = (Button) findViewById(R.id.next);
+        btnImageChooser = (Button) findViewById(R.id.imageChooser);
         btnUpload = (Button) findViewById(R.id.upload);
-        ivGambar = (ImageView) findViewById(R.id.gambar);
         etNamaGambar = (EditText) findViewById(R.id.namaGambar);
-        lokasiGamabar = new ArrayList<>();
         progressDialog = new ProgressDialog(UploadActivity.this);
         mAuth = FirebaseAuth.getInstance();
         mStorageRef = FirebaseStorage.getInstance().getReference();
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference myRef = database.getReference();
 
         checkFilePermissions();
-        addFilePaths();
 
 
 
-        btnBefore.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-
-            public void onClick(View view) {
-
-                if(posisiGmabar > 0){
-
-                    Log.d(TAG, "onClick: Back an Image.");
-
-                    posisiGmabar = posisiGmabar - 1;
-
-                    loadImageFromStorage();
-
-                }
-
-            }
-
-        });
-
-        btnNext.setOnClickListener(new View.OnClickListener() {
+        btnImageChooser.setOnClickListener(new View.OnClickListener() {
 
             @Override
-
             public void onClick(View view) {
 
-                if(posisiGmabar < lokasiGamabar.size() - 1){
-
-                    Log.d(TAG, "onClick: Next Image.");
-
-                    posisiGmabar = posisiGmabar + 1;
-
-                    loadImageFromStorage();
-
-                }
+                Intent intent = new Intent(UploadActivity.this, AlbumSelectActivity.class);
+                intent.putExtra(ConstantsCustomGallery.INTENT_EXTRA_LIMIT, 1); // set limit for image selection
+                startActivityForResult(intent, ConstantsCustomGallery.REQUEST_CODE);
 
             }
-
         });
 
         btnUpload.setOnClickListener(new View.OnClickListener() {
 
             @Override
-
             public void onClick(View view) {
-
                 Log.d(TAG, "onClick: Uploading Image.");
-
                 progressDialog.setMessage("Uploading Image...");
-
                 progressDialog.show();
-
-
-
-                //get the signed in user
-
                 FirebaseUser user = mAuth.getCurrentUser();
-
-                String userID = user.getUid();
-
-
-
+                final String userID = user.getUid();
                 String name = etNamaGambar.getText().toString();
 
-                if(!name.equals("")){
-
-                    Uri uri = Uri.fromFile(new File(lokasiGamabar.get(posisiGmabar)));
-
-                    StorageReference storageReference = mStorageRef.child("images/users/" + userID + "/" + name + ".jpg");
+                    Uri uri = Uri.fromFile(new File(path));
+                    StorageReference storageReference = mStorageRef.child("images/users/" + userID + "/" + name);
 
                     storageReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
                         @Override
 
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
                             // Get a URL to the uploaded content
-
-                        //    @SuppressWarnings("VisibleForTests")  Uri downloadUrl = taskSnapshot.getDownloadUrl();
-
+                            @SuppressWarnings("VisibleForTests")  Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                            String linkDownload = String.valueOf(downloadUrl);
+                            myRef.child("gambar").child(userID).child("linkgambar").setValue(linkDownload);
                             Toast.makeText(UploadActivity.this,"berhasil", Toast.LENGTH_SHORT).show();
-
                             progressDialog.dismiss();
 
                         }
@@ -159,79 +120,44 @@ public class UploadActivity extends AppCompatActivity {
                         @Override
 
                         public void onFailure(@NonNull Exception e) {
-
                             Toast.makeText(UploadActivity.this,"gagal", Toast.LENGTH_SHORT).show();
-
                             progressDialog.dismiss();
-
                         }
 
                     })
-
                     ;
-
-                }
-
-
-
             }
-
         });
     }
 
-    private void addFilePaths(){
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-        Log.d(TAG, "addFilePaths: Adding file paths.");
+        if (requestCode == ConstantsCustomGallery.REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
+            //The array list has the image paths of the selected images
+            ArrayList<Image> images = data.getParcelableArrayListExtra(ConstantsCustomGallery.INTENT_EXTRA_IMAGES);
 
-        String path = System.getenv("EXTERNAL_STORAGE");
-
-        lokasiGamabar.add(path+"/Pictures/Instagram/aku.jpg");
-
-        lokasiGamabar.add(path+"/Pictures/Instagram/mereka.jpg");
-
-        lokasiGamabar.add(path+"/Pictures/Instagram/saya.jpg");
-
-        loadImageFromStorage();
-
-    }
-
-    private void loadImageFromStorage() {
-        try{
-
-            String path = lokasiGamabar.get(posisiGmabar);
-
-            File f=new File(path, "");
-
-            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
-
-            ivGambar.setImageBitmap(b);
-
-        }catch (FileNotFoundException e){
-
-            Log.e(TAG, "loadImageFromStorage: FileNotFoundException: " + e.getMessage() );
-
+            for (int i = 0; i < images.size(); i++) {
+                Uri uri = Uri.fromFile(new File(images.get(i).path));
+                // start play with image uri
+                rawPath= String.valueOf(uri);
+            }
+            path = rawPath.replaceAll("file://","");// untuk menghilangkan "file//" pada path gambar
+            String filename=path.substring(path.lastIndexOf("/")+1);//untuk mendapatkan nama file
+            etNamaGambar.setText(filename);
         }
     }
 
     @TargetApi(Build.VERSION_CODES.M)
     private void checkFilePermissions() {
-
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP){
-
             int permissionCheck = UploadActivity.this.checkSelfPermission("Manifest.permission.READ_EXTERNAL_STORAGE");
-
             permissionCheck += UploadActivity.this.checkSelfPermission("Manifest.permission.WRITE_EXTERNAL_STORAGE");
-
             if (permissionCheck != 0) {
-
                 this.requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE,android.Manifest.permission.READ_EXTERNAL_STORAGE}, 1001); //Any number
-
             }
-
         }else{
-
             Log.d(TAG, "checkBTPermissions: No need to check permissions. SDK version < LOLLIPOP.");
-
         }
 
     }
