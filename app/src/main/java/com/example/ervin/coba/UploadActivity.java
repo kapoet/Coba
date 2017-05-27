@@ -68,8 +68,7 @@ public class UploadActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(UploadActivity.this);
         mAuth = FirebaseAuth.getInstance();
         mStorageRef = FirebaseStorage.getInstance().getReference();
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        final DatabaseReference myRef = database.getReference();
+
 
         checkFilePermissions();
 
@@ -96,6 +95,8 @@ public class UploadActivity extends AppCompatActivity {
                 progressDialog.show();
                 FirebaseUser user = mAuth.getCurrentUser();
                 final String userID = user.getUid();
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                final DatabaseReference myRef = database.getReference().child("gambar").child(userID);
                 String name = etNamaGambar.getText().toString();
 
                     Uri uri = Uri.fromFile(new File(path));
@@ -109,7 +110,9 @@ public class UploadActivity extends AppCompatActivity {
                             // Get a URL to the uploaded content
                             @SuppressWarnings("VisibleForTests")  Uri downloadUrl = taskSnapshot.getDownloadUrl();
                             String linkDownload = String.valueOf(downloadUrl);
-                            myRef.child("gambar").child(userID).child("linkgambar").setValue(linkDownload);
+                            String nGambar=etNamaGambar.getText().toString();
+                            ItemGambar IG = new ItemGambar(linkDownload,nGambar);
+                            myRef.push().setValue(IG);
                             Toast.makeText(UploadActivity.this,"berhasil", Toast.LENGTH_SHORT).show();
                             progressDialog.dismiss();
 
